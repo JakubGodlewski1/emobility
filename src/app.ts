@@ -1,13 +1,12 @@
 import "express-async-errors"
 import express from "express";
 import morgan from "morgan"
-import dotenv from "dotenv";
 import helmet from "helmet";
+import {routerV1} from "./routers/index.js";
+import {errorHandler} from "./errors/errorHandler.js";
 
 //app init
-dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 //middleware
 app.use(express.json());
@@ -15,13 +14,12 @@ app.use(morgan("dev"));
 app.use(helmet());
 
 //routers
+app.use("/api/v1",routerV1)
 
 //no found route
 
-//error handlers
+//error handler
+app.use(errorHandler)
 
 
-//start server
-app.listen(PORT, () => {
-    console.log("Server running on port: " + PORT);
-})
+export default app;
