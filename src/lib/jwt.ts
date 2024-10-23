@@ -30,4 +30,18 @@ export default class Jwt {
     static createRefreshToken(payload: string) {
         return jwt.sign({username: payload}, REFRESH_TOKEN_SECRET!, {expiresIn: REFRESH_TOKEN_EXPIRATION_TIME!})
     }
+
+    static verifyAccessToken(token: string): boolean {
+        let success = true;
+
+        const separateToken = token.split(" ")[1]
+        jwt.verify(separateToken, ACCESS_TOKEN_SECRET!, (error) => {
+            if (error) {
+                console.log(error)
+                success = false
+            }
+        })
+
+        return success;
+    }
 }
