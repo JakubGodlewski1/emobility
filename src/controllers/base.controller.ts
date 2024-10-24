@@ -55,7 +55,6 @@ export default class Controller<T extends Record<string, any>> {
     create = async (req: Request, res: Response) => {
         const el = req.body
         const newEl = await this.repo.insert(el)
-        console.log({newEl})
         if (!newEl) {
             throw new InternalError("We could not create a new element, try again later")
         }
