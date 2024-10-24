@@ -1,10 +1,17 @@
 import {afterAll, beforeAll} from "vitest";
 import pool from "./src/lib/orm/db.js";
+import {PoolClient} from "pg";
+
+let client:PoolClient | undefined;
 
 beforeAll(async () => {
-   await pool.connect()
+   client = await pool.connect()
+
 })
 
 afterAll(async () => {
-    await pool.end()
+    if (client){
+        client.release()
+        await pool.end()
+    }
 })
