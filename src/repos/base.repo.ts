@@ -4,7 +4,7 @@ import {toSnakeCase} from "../lib/orm/toSnakeCase.js";
 import pool from "../lib/orm/db.js";
 import {PoolClient} from "pg";
 import {validateTableNames} from "../utils/ValidateTableNames.js";
-import {TableName} from "../../types.js";
+import {Summary, TableName} from "../../types.js";
 
 export default class Repo<T extends Record<string, any>> {
     tableName: TableName;
@@ -12,6 +12,30 @@ export default class Repo<T extends Record<string, any>> {
     constructor(tableName: TableName) {
         validateTableNames(tableName)
         this.tableName = tableName;
+    }
+
+    static getSummary = async (chargingStationId: string): Promise<Summary> => {
+        //get amount of connectors connected to charging station, plug_count from charging station type and id of charging station
+
+        const {rows} = await pool.query(`
+        SELECT
+         COUNT(connector.id) AS connectors,
+        (SELECT COUNT(connector.id) FROM connector WHERE connector.priority = true) AS connectors_with_priority,
+        charging_station_type.plug_count
+        FROM charging_station
+        JOIN connector ON connector.charging_station_id = charging_station.id
+        JOIN charging_station_type ON charging_station_type.id = charging_station.charging_station_type_id
+        WHERE charging_station.id = $1
+        GROUP BY charging_station.id, charging_station_type.plug_count;
+    `, [chargingStationId]);
+
+        if (rows.length === 0)
+            rows[0] = {
+                connectors: 0,
+                plugCount: undefined,
+                connectorsWithPriority: 0
+            } as Summary
+        return toCamelCase(rows)[0] as Summary;
     }
 
     getById = async (id: string, {client: transactionClient}: { client?: PoolClient } = {}): Promise<T> => {
