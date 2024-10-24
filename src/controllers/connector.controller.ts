@@ -1,7 +1,11 @@
-import BaseController from "./base.controller.js";
+import Controller from "./base.controller.js";
+import {Connector, TableName} from "../../types.js";
 
-class ConnectorController extends BaseController{
-
+class ConnectorController extends Controller<Connector> {
+    constructor() {
+        const tableName: TableName = 'connector';
+        super(tableName);
+    }
 }
 
-export default new ConnectorController("connector")
+export default new ConnectorController()

@@ -1,0 +1,10 @@
+{
+  "type":"commonjs",
+  "name":"migrations",
+  "version": "1.0.0",
+  "main":"migrations/1729162911215_table-comments.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

@@ -51,8 +51,7 @@ describe("auth", ()=>{
         })
 
         //add token to headers and get connectors
-        const {body} = await request(app).get("/api/v1/connectors") .set('authorization', `Bearer ${accessToken}`)
-
+        const {body} = await request(app).get("/api/v1/connectors").set('authorization', `Bearer ${accessToken}`)
         expect(Array.isArray(body.data)).toBe(true)
     });
 })
