@@ -4,7 +4,7 @@ import {uuidRegex} from "../utils/uuidRegex.js";
 export default class ConnectorValidator {
     static create = z.object({
         name:
-            z.string({message: "Connector name is not provided"}),
+            z.string({message: "Connector name must be provided"}),
         priority:
             z.boolean({invalid_type_error: "Priority has to be of type boolean"})
                 .default(false),
@@ -16,7 +16,7 @@ export default class ConnectorValidator {
 
     static update = z.object({
         name:
-            z.string({message: "Connector name is not provided"})
+            z.string({message: "Connector name must be provided"})
                 .optional(),
         priority:
             z.boolean({invalid_type_error: "Priority has to be of type boolean"})

@@ -7,13 +7,18 @@ export const chargingStationTypeRouter = Router();
 const {create, update, getById, get, deleteById} = ChargingStationTypeController
 
 const {
-    createBody:validateCreateBody,
-    id: validateId
-} = chargingStationTypeValidation
+    id: validateId,
+    elExists,
+    getBody: validateGetBody,
+    createBody: validateCreateBody,
+    updateBody: validateUpdateBody,
+    updateAction: validateUpdateAction,
+    deleteAction: validateDeleteAction,
 
+} = chargingStationTypeValidation;
 
-chargingStationTypeRouter.get("/:id", validateId, getById)
-chargingStationTypeRouter.get("/", get)
+chargingStationTypeRouter.get("/:id", validateId, elExists, getById)
+chargingStationTypeRouter.get("/", validateGetBody, get)
 chargingStationTypeRouter.post("/", validateCreateBody, create)
-chargingStationTypeRouter.put("/:id", validateId, update)
-chargingStationTypeRouter.delete("/:id",validateId, deleteById)
+chargingStationTypeRouter.put("/:id", validateId, elExists, validateUpdateBody, validateUpdateAction, update)
+chargingStationTypeRouter.delete("/:id", validateId, elExists, validateDeleteAction, deleteById)
