@@ -1,7 +1,7 @@
 import {afterEach, describe} from "vitest";
-import {CreateConnector} from "../types.js";
-import Test from "./helpers.js";
-import connectorRepo from "../src/repos/connector.repo.js";
+import {CreateConnector} from "../../types.js";
+import Test from "../helpers.js";
+import connectorRepo from "../../src/repos/connector.repo.js";
 
 describe("connectors",async () => {
     const {request} = await Test.build("connectors")

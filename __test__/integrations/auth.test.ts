@@ -1,6 +1,6 @@
 import request from "supertest"
 import {describe, expect} from "vitest";
-import app from "../src/app.js";
+import app from "../../src/app.js";
 
 const url = "/api/v1/auth"
 

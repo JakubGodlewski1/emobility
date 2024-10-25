@@ -1,4 +1,4 @@
-import {NextFunction, Response, Request} from "express";
+import {Request, Response} from "express";
 import {loadDotEnv} from "../utils/loadDotEnv.js";
 import {InternalError, UnauthorizedError} from "../errors/customErrors.js";
 import Jwt from "../lib/jwt.js";
@@ -14,7 +14,7 @@ if (!USERNAME || !PASSWORD) {
 }
 
 export default class AuthController {
-    static signIn(req: Request, res: Response, next: NextFunction) {
+    static signIn(req: Request, res: Response) {
         const {username, password} = req.body;
 
         //validate credentials
