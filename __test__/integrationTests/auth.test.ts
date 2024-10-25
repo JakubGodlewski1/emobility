@@ -1,7 +1,6 @@
 import request from "supertest"
 import {describe, expect} from "vitest";
 import app from "../../src/app.js";
-import {log} from "winston";
 
 const url = "/api/v1/auth"
 
