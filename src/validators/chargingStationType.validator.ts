@@ -9,7 +9,7 @@ export default class ChargingStationTypeValidator {
                 .max(40, {message: "Name must be at most 40 characters long"}),
         plugCount:
             z.number({invalid_type_error: "Plug Count must be a number.", required_error: "Please provide count count"})
-                .min(1, "Charging station has to include at least one connector")
+                .min(1, "Plug count minimum value is 1")
                 .max(20, {message: "Charging station cannot include more than 20 connectors"})
                 .int("The number you provided is not valid"),
         efficiency:
@@ -32,7 +32,7 @@ export default class ChargingStationTypeValidator {
         ,
         plugCount:
             z.number({invalid_type_error: "Plug Count must be a number"})
-                .min(1, "Charging station has to include at least one connector")
+                .min(1, "Plug count minimum value is 1")
                 .max(20, {message: "Charging station cannot include more than 20 connectors"})
                 .int("The number you provided is not valid")
                 .optional(),

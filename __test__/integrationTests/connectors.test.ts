@@ -132,7 +132,7 @@ describe("connectors",async () => {
         //expect error
         expect(body.success).toBe(false)
         expect(body.error).not.toBe(undefined)
-        expect(body.error).toMatch(/can't add the connector to charging station with specified type/i)
+        expect(body.error).toMatch(/the connector to charging station that has a specified type/i)
 
         //try to update the first connector by adding a new charging station id
          const response =await request.put(connectorId, {chargingStationId} as Partial<CreateConnector>)
@@ -140,7 +140,7 @@ describe("connectors",async () => {
         //expect error
         expect(response.body.success).toBe(false)
         expect(body.error).not.toBe(undefined)
-        expect(body.error).toMatch(/can't add the connector to charging station with specified type/i)
+        expect(body.error).toMatch(/the connector to charging station that has a specified type/i)
     });
 
     it('should not be able to set priority to true in a charging station if another connector connected to the station has already set priority to true', async () => {

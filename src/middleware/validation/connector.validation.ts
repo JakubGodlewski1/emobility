@@ -23,7 +23,7 @@ class ConnectorValidation extends Validation {
         const summary: Summary = await Repo.getSummary(connector.chargingStationId)
 
         if (summary.plugCount) {
-            throw new BadRequestError("You can't add the connector to charging station with specified type")
+            throw new BadRequestError("You can't add the connector to charging station that has a specified type")
         }
 
         if (summary.connectorsWithPriority && summary.connectorsWithPriority > 0 && connector.priority) {
@@ -44,7 +44,11 @@ class ConnectorValidation extends Validation {
 
         //if connector has a new charging station id, validate that the charging station does not have type
         if (update.chargingStationId){
-            const chargingStation = await ChargingStationRepo.getById(id)
+            const chargingStation = await ChargingStationRepo.getById(update.chargingStationId)
+            if (!chargingStation){
+                throw new BadRequestError("charging station with provided id does not exist")
+            }
+
             if (chargingStation.chargingStationTypeId){
                 throw new BadRequestError("You can't add the connector to charging station with specified type")
             }
