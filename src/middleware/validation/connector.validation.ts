@@ -21,7 +21,7 @@ class ConnectorValidation extends Validation {
 
         const summary: Summary = await Repo.getSummary(connector.chargingStationId)
 
-        const isTypeSpecified = !!summary.plugCount || connector.chargingStationId
+        const isTypeSpecified = !!summary.plugCount
         if (isTypeSpecified) {
             throw new BadRequestError("You can't add the connector to charging station with specified type")
         }

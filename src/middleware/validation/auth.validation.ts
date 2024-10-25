@@ -9,7 +9,7 @@ export default class AuthValidation {
            throw new UnauthorizedError("Access denied. Access token missing. You have to log in first.")
         }
 
-        const success = Jwt.verifyAccessToken(accessToken)
+        const success = Jwt.verifyToken(accessToken, "access")
         if (!success) {
             throw new UnauthorizedError("Access denied. Access token invalid. You have to log in again.")
         }

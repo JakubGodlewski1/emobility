@@ -31,11 +31,12 @@ export default class Jwt {
         return jwt.sign({username: payload}, REFRESH_TOKEN_SECRET!, {expiresIn: REFRESH_TOKEN_EXPIRATION_TIME!})
     }
 
-    static verifyAccessToken(token: string): boolean {
+    static verifyToken(token: string, type: "access" | "refresh"): boolean {
         let success = true;
+        const tokenSecret = type === "access" ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET
 
         const separateToken = token.split(" ")[1]
-        jwt.verify(separateToken, ACCESS_TOKEN_SECRET!, (error) => {
+        jwt.verify(separateToken,  tokenSecret!, (error) => {
             if (error) {
                 console.log(error)
                 success = false
