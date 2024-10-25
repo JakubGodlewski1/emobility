@@ -11,5 +11,5 @@ const {validateAccessToken} = AuthValidation
 
 routerV1.use("/auth", authRouter)
 routerV1.use("/connectors", validateAccessToken, connectorRouter)
-routerV1.use("/charging-station-types", chargingStationTypeRouter)
-routerV1.use("/charging-stations", chargingStationRouter)
+routerV1.use("/charging-station-types",validateAccessToken, chargingStationTypeRouter)
+routerV1.use("/charging-stations", validateAccessToken,chargingStationRouter)
