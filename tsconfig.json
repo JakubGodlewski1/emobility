@@ -9,7 +9,7 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "strict": true
 
   },

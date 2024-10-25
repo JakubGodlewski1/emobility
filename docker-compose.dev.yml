@@ -1,0 +1,47 @@
+services:
+  db-test:
+    image: "postgres"
+    environment:
+      POSTGRES_DB: emobility-test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    restart: unless-stopped
+    ports:
+      - "5430:5432"
+
+  db-dev:
+    image: "postgres"
+    environment:
+      POSTGRES_DB: emobility-dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    restart: unless-stopped
+    volumes:
+      - emobility-dev:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"
+
+  migrate-test:
+    image: "node:20"
+    working_dir: /app
+    depends_on:
+      - db-test
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgres://postgres:password@db-test:5432/emobility-test
+    command: ./docker-entrypoint.sh
+
+  migrate-dev:
+    image: "node:20"
+    working_dir: /app
+    depends_on:
+      - db-dev
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgres://postgres:password@db-dev:5432/emobility-dev
+    command: ./docker-entrypoint.sh
+
+volumes:
+  emobility-dev:
