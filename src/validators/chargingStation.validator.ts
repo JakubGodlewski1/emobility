@@ -1,7 +1,7 @@
 import {z} from "zod";
 import {uuidRegex} from "../utils/uuidRegex.js";
 
-export default class StationValidator {
+export default class ChargingStationValidator {
     static create = z.object({
         name:
             z.string({message: "Name must be provided"})
@@ -46,7 +46,7 @@ export default class StationValidator {
         chargingStationTypeId:
             z.string({message: "Charging station type id must be provided"})
                 .regex(uuidRegex, {message: "Invalid charging station type"})
-                .optional(),
+                .optional().nullable(),
     })
         .strict("You passed a key that does not exist on charging station object")
 

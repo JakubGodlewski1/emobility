@@ -10,8 +10,8 @@ import {TableName} from "../../../types.js";
 import chargingStationTypeRepo from "../../repos/chargingStationType.repo.js";
 import chargingStationRepo from "../../repos/chargingStation.repo.js";
 import ConnectorValidator from "../../validators/connector.validator.js";
-import StationValidator from "../../validators/station.validator.js";
-import StationTypeValidator from "../../validators/stationType.validator.js";
+import ChargingStationValidator from "../../validators/chargingStation.validator.js";
+import ChargingStationTypeValidator from "../../validators/chargingStationType.validator.js";
 
 const TABLES_REPOS_MAP: Record<TableName, typeof connectorRepo | typeof chargingStationRepo | typeof chargingStationTypeRepo> = {
     connector: connectorRepo,
@@ -26,14 +26,14 @@ const VALIDATOR_MAP: Record<TableName, Record<"create" | "update" | "get", z.Zod
         get: ConnectorValidator.get,
     },
     charging_station: {
-        create: StationValidator.create,
-        update: StationValidator.update,
-        get: StationValidator.get,
+        create: ChargingStationValidator.create,
+        update: ChargingStationValidator.update,
+        get: ChargingStationValidator.get,
     },
     charging_station_type: {
-        create: StationTypeValidator.create,
-        update: StationTypeValidator.update,
-        get: StationTypeValidator.get
+        create: ChargingStationTypeValidator.create,
+        update: ChargingStationTypeValidator.update,
+        get: ChargingStationTypeValidator.get
     }
 }
 

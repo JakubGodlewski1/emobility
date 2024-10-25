@@ -1,7 +1,7 @@
 import {z} from "zod";
 import ConnectorValidator from "./src/validators/connector.validator.js";
-import StationValidator from "./src/validators/station.validator.js";
-import StationTypeValidator from "./src/validators/stationType.validator.js";
+import ChargingStationValidator from "./src/validators/chargingStation.validator.js";
+import ChargingStationTypeValidator from "./src/validators/chargingStationType.validator.js";
 
 
 //connector
@@ -11,14 +11,14 @@ type Connector = {
 } & CreateConnector
 
 //charging station
-type CreateChargingStation = z.infer<typeof StationValidator.create>
+type CreateChargingStation = z.infer<typeof ChargingStationValidator.create>
 type ChargingStation = {
     id: string
 } & CreateChargingStation
 
 
 //charging station type
-type CreateChargingStationType = z.infer<typeof StationTypeValidator.create>
+type CreateChargingStationType = z.infer<typeof ChargingStationTypeValidator.create>
 type ChargingStationType = {
     id: string
 } & CreateChargingStationType

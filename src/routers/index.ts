@@ -4,6 +4,7 @@ import {connectorRouter} from "./connector.router.js";
 import AuthValidation from "../middleware/validation/auth.validation.js";
 import {chargingStationTypeRouter} from "./chargingStationType.router.js";
 import {chargingStationRouter} from "./chargingStation.router.js";
+import app from "../app.js";
 
 export const routerV1 = Router();
 
