@@ -23,18 +23,12 @@ export default class Repo<T extends Record<string, any>> {
         (SELECT COUNT(connector.id) FROM connector WHERE connector.priority = true) AS connectors_with_priority,
         charging_station_type.plug_count
         FROM charging_station
-        JOIN connector ON connector.charging_station_id = charging_station.id
-        JOIN charging_station_type ON charging_station_type.id = charging_station.charging_station_type_id
+        LEFT JOIN connector ON connector.charging_station_id = charging_station.id
+        LEFT JOIN charging_station_type ON charging_station_type.id = charging_station.charging_station_type_id
         WHERE charging_station.id = $1
         GROUP BY charging_station.id, charging_station_type.plug_count;
     `, [chargingStationId]);
 
-        if (rows.length === 0)
-            rows[0] = {
-                connectors: 0,
-                plugCount: undefined,
-                connectorsWithPriority: 0
-            } as Summary
         return toCamelCase(rows)[0] as Summary;
     }
 

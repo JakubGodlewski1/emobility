@@ -14,10 +14,11 @@ const {
     updateBody: validateUpdateBody,
     createAction: validateCreateAction,
     deleteAction: validateDeleteAction,
+    updateAction: validateUpdateAction,
 } = connectorValidation;
 
 connectorRouter.get("/:id", validateId, elExists, getById)
 connectorRouter.get("/", validateGetBody, get)
 connectorRouter.post("/", validateCreateBody, validateCreateAction, create)
-connectorRouter.put("/:id", validateId, elExists, validateUpdateBody, update)
+connectorRouter.put("/:id", validateId, elExists, validateUpdateBody, validateUpdateAction, update)
 connectorRouter.delete("/:id", validateId, elExists, validateDeleteAction, deleteStation)

@@ -1,9 +1,10 @@
 import Validation from "./base.validation.js";
 import {NextFunction, Request, Response} from "express";
-import {CreateConnector, Summary} from "../../../types.js";
+import {Connector, CreateConnector, Summary} from "../../../types.js";
 import {BadRequestError} from "../../errors/customErrors.js";
 import Repo from "../../repos/base.repo.js";
 import ConnectorRepo from "../../repos/connector.repo.js";
+import ChargingStationRepo from "../../repos/chargingStation.repo.js";
 
 class ConnectorValidation extends Validation {
     constructor() {
@@ -21,12 +22,44 @@ class ConnectorValidation extends Validation {
 
         const summary: Summary = await Repo.getSummary(connector.chargingStationId)
 
-        const isTypeSpecified = !!summary.plugCount
-        if (isTypeSpecified) {
+        if (summary.plugCount) {
             throw new BadRequestError("You can't add the connector to charging station with specified type")
         }
 
         if (summary.connectorsWithPriority && summary.connectorsWithPriority > 0 && connector.priority) {
+            throw new Error("Charging station can handle only one connector with priority")
+        }
+
+        next()
+    }
+
+    updateAction = async (req: Request, res: Response, next: NextFunction) => {
+        const update = req.body as Partial<CreateConnector>;
+        const id = req.params.id
+        const connector = await ConnectorRepo.getById(id) as Connector
+
+        if (!update.chargingStationId && !connector.chargingStationId){
+            return next()
+        }
+
+        //if connector has a new charging station id, validate that the charging station does not have type
+        if (update.chargingStationId){
+            const chargingStation = await ChargingStationRepo.getById(id)
+            if (chargingStation.chargingStationTypeId){
+                throw new BadRequestError("You can't add the connector to charging station with specified type")
+            }
+        }
+
+
+        //validate the amount of connectors with priority
+        if (!update.priority){
+            return next()
+        }
+
+        const currentChargingStationId = update.chargingStationId || connector.chargingStationId!
+
+        const summary:Summary = await Repo.getSummary(currentChargingStationId)
+        if (summary.connectorsWithPriority && summary.connectorsWithPriority > 0) {
             throw new Error("Charging station can handle only one connector with priority")
         }
 

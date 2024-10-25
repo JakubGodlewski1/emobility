@@ -1,8 +1,11 @@
 import Validation from "./base.validation.js";
 import {NextFunction, Request, Response} from "express";
-import {ChargingStation, CreateChargingStation} from "../../../types.js";
+import {CreateChargingStation} from "../../../types.js";
 import chargingStationRepo from "../../repos/chargingStation.repo.js";
 import ChargingStationRepo from "../../repos/chargingStation.repo.js";
+import ChargingStationTypeRepo from "../../repos/chargingStationType.repo.js";
+import ConnectorRepo from "../../repos/connector.repo.js";
+import {BadRequestError} from "../../errors/customErrors.js";
 
 class chargingStationValidation extends Validation {
     constructor() {
@@ -30,18 +33,26 @@ class chargingStationValidation extends Validation {
 
     updateAction = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params.id
-        //cant update type if the current type is not null
-        const update = req.body as ChargingStation
-        if (!update.chargingStationTypeId) {
+        const update = req.body as Partial<CreateChargingStation>
+        const chargingStation = await ChargingStationRepo.getById(id)
+
+        //if there is no charging station type id in neither update nor current charging station, then call next.
+        //also if update includes chargingStationTypeId = null, just go next
+        if ((!update.chargingStationTypeId && !chargingStation.chargingStationTypeId) || update.chargingStationTypeId===null){
             return next()
         }
 
-        const prev = await ChargingStationRepo.getById(id)
-        if (prev.chargingStationTypeId){
-            throw new Error("You cant update charging station type. You have to delete it first, update the amount of connectors and add new charging station type")
+        //otherwise, validate that charging station type has the same ammount of connectors as the type plug_count
+        const currentChargingStationTypeId = update.chargingStationTypeId || chargingStation.chargingStationTypeId!
+        const chargingStationType = await ChargingStationTypeRepo.getById(currentChargingStationTypeId)
+
+        const numberOfConnectors = await ConnectorRepo.get({chargingStationId: id})
+
+        if (numberOfConnectors.length !== chargingStationType.plugCount){
+            throw new BadRequestError("The amount of connectors on charging station does not equal to plug count on the type")
         }
 
-        return next()
+        next()
     }
 }
 
