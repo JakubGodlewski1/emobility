@@ -91,7 +91,7 @@ export default class Repo<T extends Record<string, any>> {
         return toCamelCase(rows)[0] as T
     }
 
-    deleteAll = async ({client: transactionClient}: { client?: PoolClient } = {}): Promise<T> => {
+    deleteAll = async ({client: transactionClient}: { client?: PoolClient } = {}): Promise<T[]> => {
         const client = getQueryClient(transactionClient)
 
         const {rows} = await client.query(`
@@ -99,7 +99,7 @@ export default class Repo<T extends Record<string, any>> {
             RETURNING *;
         `,)
 
-        return toCamelCase(rows)[0] as T
+        return toCamelCase(rows) as T[]
     }
 
 
@@ -108,22 +108,17 @@ export default class Repo<T extends Record<string, any>> {
     } = {}): Promise<T> => {
         const client = getQueryClient(transactionClient)
 
-        // Convert update fields to snake case
-        const snakeCasedObj = toSnakeCase(update);
-
-        // Get the keys of the fields to update
-        const keys = Object.keys(snakeCasedObj);
-
-        // If there are no fields to update, throw an error
-        if (keys.length === 0) {
+        if (!update || Object.keys(update).length === 0) {
             throw new Error("No fields provided to update");
         }
 
-        // create the SET clause
+        const snakeCasedObj = toSnakeCase(update);
+
+        const keys = Object.keys(snakeCasedObj);
+
         const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(", ");
         const values = keys.map(key => snakeCasedObj[key]);
 
-        // First value is the id, followed by the update field values
         const {rows} = await client.query(
             `
         UPDATE ${this.tableName}
@@ -134,7 +129,6 @@ export default class Repo<T extends Record<string, any>> {
             [id, ...values]
         );
 
-        // Return the updated element
         return toCamelCase(rows)[0] as T;
     }
 
@@ -143,18 +137,15 @@ export default class Repo<T extends Record<string, any>> {
     } = {}): Promise<T> => {
         const client = getQueryClient(transactionClient);
 
-        // Validate the element is provided
         if (!element || Object.keys(element).length === 0) {
             throw new Error("No element provided for insertion");
         }
 
-        // Get the column names from the keys of the element
+
         const columns = Object.keys(toSnakeCase(element));
 
-        // Create a string of placeholders ($1, $2, etc.)
         const valuesPlaceholders = `(${columns.map((_, i) => `$${i + 1}`).join(', ')})`;
 
-        // Get the values from the element
         const values = Object.values(toSnakeCase(element));
 
         const query = `
@@ -165,6 +156,7 @@ export default class Repo<T extends Record<string, any>> {
 
         const {rows} = await client.query(query, values);
 
-        return toCamelCase(rows)[0] as T;  // Return a single inserted row as the result
+        // Return a single inserted row as the result
+        return toCamelCase(rows)[0] as T;
     };
 }
