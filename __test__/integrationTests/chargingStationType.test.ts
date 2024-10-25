@@ -1,6 +1,6 @@
 import {afterEach, describe} from "vitest";
 import {CreateChargingStationType} from "../../types.js";
-import Test from "../helpers.js";
+import Test from "./Test.js";
 import chargingStationTypeRepo from "../../src/repos/chargingStationType.repo.js";
 
 describe("chargingStationType",async () => {

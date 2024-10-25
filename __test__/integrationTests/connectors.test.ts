@@ -1,6 +1,6 @@
 import {afterEach, describe} from "vitest";
 import {CreateConnector} from "../../types.js";
-import Test from "../helpers.js";
+import Test from "./Test.js";
 import connectorRepo from "../../src/repos/connector.repo.js";
 
 describe("connectors",async () => {

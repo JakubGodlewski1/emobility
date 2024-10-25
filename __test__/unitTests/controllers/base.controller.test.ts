@@ -1,8 +1,8 @@
 import {afterEach, describe, expect} from "vitest";
-import Controller from "../../src/controllers/base.controller.js";
-import connectorRepo from "../../src/repos/connector.repo.js";
+import Controller from "../../../src/controllers/base.controller.js";
+import connectorRepo from "../../../src/repos/connector.repo.js";
 
-vi.mock("../../src/repos/connector.repo.js")
+vi.mock("../../../src/repos/connector.repo.js")
 
 const connector1 = {
     id: "1",

@@ -1,7 +1,8 @@
 import {describe, expect} from "vitest";
-import Jwt from "../../src/lib/jwt.js";
-import AuthController from "../../src/controllers/auth.controller.js";
-vi.mock("../../src/lib/jwt.js")
+import Jwt from "../../../src/lib/jwt.js";
+import AuthController from "../../../src/controllers/auth.controller.js";
+
+vi.mock("../../../src/lib/jwt.js")
 
 describe("AuthController", () => {
     const req = {

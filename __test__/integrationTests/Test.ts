@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from "../src/app.js";
+import app from "../../src/app.js";
 
 type Endpoint = "connectors" | "charging-stations" | "charging-station-types";
 

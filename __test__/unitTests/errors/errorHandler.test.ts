@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {StatusCodes} from "http-status-codes";
-import {errorHandler} from "../../src/errors/errorHandler.js";
+import {errorHandler} from "../../../src/errors/errorHandler.js";
 
 describe('errorHandler middleware', () => {
     const config = (message?:string, statusCode?:number)=>{
