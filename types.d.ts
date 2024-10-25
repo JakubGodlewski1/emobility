@@ -28,7 +28,7 @@ type Reply = {
     success: true,
     data: ChargingStation | ChargingStation[] | Connector | Connector[] | ChargingStationType | ChargingStationType[] | {
         accessToken: string
-    } | undefined
+    } | null
 } | {
     success: false,
     error: string

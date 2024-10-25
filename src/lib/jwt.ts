@@ -33,9 +33,10 @@ export default class Jwt {
 
     static verifyToken(token: string, type: "access" | "refresh"): boolean {
         let success = true;
+
         const tokenSecret = type === "access" ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET
 
-        const separateToken = token.split(" ")[1]
+        const separateToken = type ==="access" ? token.split(" ")[1] : token
         jwt.verify(separateToken,  tokenSecret!, (error) => {
             if (error) {
                 console.log(error)

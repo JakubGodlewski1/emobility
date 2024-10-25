@@ -21,7 +21,7 @@ describe("JWT", () => {
 
      it('should properly validate jwt refresh token', () => {
         const token = Jwt.createRefreshToken("123")
-        const success  = Jwt.verifyToken("bearer "+token, "refresh")
+        const success  = Jwt.verifyToken(token, "refresh")
         expect(success).toBe(true)
     });
 

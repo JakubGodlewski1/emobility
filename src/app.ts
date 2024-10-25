@@ -7,6 +7,7 @@ import {errorHandler} from "./errors/errorHandler.js";
 import {StatusCodes} from "http-status-codes";
 import {Reply} from "../types.js";
 import logger from "./config/logger.js";
+import cookieParser from "cookie-parser";
 
 //app init
 const app = express();
@@ -17,6 +18,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 //middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(helmet());
