@@ -1,14 +1,38 @@
-import {afterEach, describe} from "vitest";
-import {CreateChargingStation} from "../../types.js";
+import {afterEach, beforeAll, describe, expect} from "vitest";
+import {CreateChargingStation, CreateChargingStationType, CreateConnector} from "../../types.js";
 import Test from "./Test.js";
 import chargingStationRepo from "../../src/repos/chargingStation.repo.js";
+import connectorRepo from "../../src/repos/connector.repo.js";
+import chargingStationTypeRepo from "../../src/repos/chargingStationType.repo.js";
+
+const chargingStationType:CreateChargingStationType=  {
+    name: 'Standard AC Charger',
+    plugCount: 2,
+    efficiency: 2.2,
+    currentType: 'AC',
+}
+
+const connector:CreateConnector = {
+    name: "connector1",
+    priority: false
+}
+
+afterEach(async () => {
+    await connectorRepo.deleteAll()
+    await chargingStationRepo.deleteAll()
+    await chargingStationTypeRepo.deleteAll()
+})
+
+beforeAll(async ()=>{
+    await connectorRepo.deleteAll()
+    await chargingStationRepo.deleteAll()
+    await chargingStationTypeRepo.deleteAll()
+})
 
 describe("chargingStation",async () => {
     const {request} = await Test.build("charging-stations")
-
-    afterEach(async () => {
-        await chargingStationRepo.deleteAll()
-    })
+    const {request:connectorRequest} = await Test.build("connectors")
+    const {request:chargingStationTypeRequest} = await Test.build("charging-station-types")
 
     const chargingStation:CreateChargingStation = {
         name: "station1",
@@ -87,5 +111,44 @@ describe("chargingStation",async () => {
         expect(error1).toMatch(/ is not a valid uuid/i)
         expect(error2).toMatch(/ is not a valid uuid/i)
         expect(error3).toMatch(/ is not a valid uuid/i)
+    });
+
+    it('should not be able to add charging station type id with wrong amount of plug_counts', async () => {
+        //create charging station
+        const {body:{data:{id:chargingStationId}}} = await request.post(chargingStation as CreateChargingStation)
+
+        //create 1 connector and add it to charging station
+        await connectorRequest.post({...connector, chargingStationId} as CreateConnector)
+
+        //create type with 2 plug_counts
+        const {body:{data:{id:chargingStationTypeId}}} = await chargingStationTypeRequest.post(chargingStationType)
+
+        //try to update charging station type id in charging station
+        const {body} = await request.put(chargingStationId, {chargingStationTypeId} as Partial<CreateChargingStation>)
+
+        //expect error
+        expect(body.success).toBe(false)
+        expect(body.error).not.toBe(undefined)
+        expect(body.error).toMatch(/does not equal to plug count /i)
+    });
+
+      it('should  be able to add charging station type id with correct amount of plug_counts', async () => {
+          //create charging station
+          const {body:{data:{id:chargingStationId}}} = await request.post(chargingStation as CreateChargingStation)
+
+          //create 2 connectors and add them to charging station
+          await connectorRequest.post({...connector, chargingStationId} as CreateConnector)
+          await connectorRequest.post({...connector, chargingStationId} as CreateConnector)
+
+          //create type with 2 plug_counts
+          const {body:{data:{id:chargingStationTypeId}}} = await chargingStationTypeRequest.post(chargingStationType)
+
+          //update charging station type id in charging station
+          const {body} = await request.put(chargingStationId, {chargingStationTypeId} as Partial<CreateChargingStation>)
+
+          //expect proper update and success = true
+          expect(body.success).toBe(true)
+          expect(body.error).toBe(undefined)
+          expect(body.data).toMatchObject({...chargingStation, chargingStationTypeId})
     });
 })

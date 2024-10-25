@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/src/server.js",
     "dev": "tsx watch src/server.ts",
-    "test": "vitest",
+    "test": "vitest --no-file-parallelism",
     "test:ui": "vitest --ui",
     "migrate": "node-pg-migrate -m './dbMigrations/migrations'",
     "build": "tsc",

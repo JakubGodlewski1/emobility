@@ -1,15 +1,27 @@
-import { describe, it, expect, vi } from 'vitest';
-import { NextFunction, Request, Response } from 'express';
+import {describe, expect, it, vi} from 'vitest';
+import {NextFunction, Request, Response} from 'express';
 import chargingStationValidation from "../../../../src/middleware/validation/chargingStation.validation.js";
 import chargingStationRepo from "../../../../src/repos/chargingStation.repo.js";
-import {CreateChargingStation, CreateChargingStationType} from "../../../../types.js";
 import ChargingStationRepo from "../../../../src/repos/chargingStation.repo.js";
+import {ChargingStation, ChargingStationType, CreateChargingStation} from "../../../../types.js";
+import ChargingStationTypeRepo from "../../../../src/repos/chargingStationType.repo.js";
+import ConnectorRepo from "../../../../src/repos/connector.repo.js";
+import {BadRequestError} from "../../../../src/errors/customErrors.js";
 
-const chargingStation:CreateChargingStation = {
+const chargingStation:ChargingStation = {
     name: "SuperCharge Station",
     deviceId: "3fa25f22-5717-4562-b3fc-2c963f66afa6",
     ipAddress: "123.168.1.200",
-    firmwareVersion: "v1.0.5"
+    firmwareVersion: "v1.0.5",
+    id:"234"
+}
+
+const chargingStationType:ChargingStationType=  {
+    name: 'Standard AC Charger',
+    plugCount: 2,
+    efficiency: 2.2,
+    currentType: 'AC',
+    id:"123"
 }
 
 const uuid = "123e4567-e89b-12d3-a456-426614174000"
@@ -74,48 +86,52 @@ describe('chargingStationValidation', () => {
     });
 
     describe('updateAction', () => {
-        it("should throw an error if chargingStationTypeId is present and previous type is not null", async () => {
-            const req = {
-                params: { id: '1' },
-                body: { chargingStationTypeId: "234" },
-            } as any
+        const mockReq = {
+            params: { id: "123" },
+            body: {},
+        } as any
 
-            const res = {} as Response;
-            const next = vi.fn() as NextFunction;
+        const mockRes = {} as Partial<Response> as Response;
+        const next = vi.fn();
 
-            // Mocking the repo method to return a station with a type
-            vi.spyOn(ChargingStationRepo, 'getById').mockResolvedValue({...chargingStation, id: "12", chargingStationTypeId: "123"});
+        it("calls next if no chargingStationTypeId in update or existing charging station", async () => {
+            mockReq.body = {};
+            vi.spyOn(ChargingStationRepo, "getById").mockResolvedValue({...chargingStation, id: "321"});
 
-            await expect(chargingStationValidation.updateAction(req, res, next)).rejects.toThrow("You cant update charging station type. You have to delete it first, update the amount of connectors and add new charging station type");
-        });
-
-        it("should call next() if chargingStationTypeId is not present", async () => {
-            const req = {
-                params: { id: '1' },
-                body: { chargingStationTypeId: null },
-            } as any
-
-            const res = {} as Response;
-            const next = vi.fn() as NextFunction;
-
-            await chargingStationValidation.updateAction(req, res, next);
+            await chargingStationValidation.updateAction(mockReq, mockRes, next);
 
             expect(next).toHaveBeenCalled();
         });
 
-        it("should call next() if the previous type is null", async () => {
-            const req = {
-                params: { id: '1' },
-                body: { chargingStationTypeId: 1 },
-            } as any
 
-            const res = {} as Response;
-            const next = vi.fn() as NextFunction;
+        it("calls next if chargingStationTypeId in update is null", async () => {
+            mockReq.body = { chargingStationTypeId: null };
+            vi.spyOn(ChargingStationRepo, "getById").mockResolvedValue({...chargingStation, id: "321", chargingStationTypeId: null});
 
-            // Mocking the repo method to return a station with no type
-            vi.spyOn(ChargingStationRepo, 'getById').mockResolvedValue({...chargingStation, chargingStationTypeId: undefined, id:"12"});
+            await chargingStationValidation.updateAction(mockReq, mockRes, next);
 
-            await chargingStationValidation.updateAction(req, res, next);
+            expect(next).toHaveBeenCalled();
+        });
+
+        it("throws BadRequestError if connectors count differs from charging station type plug count", async () => {
+            mockReq.body = { chargingStationTypeId: "type-id" };
+            vi.spyOn(ChargingStationRepo, "getById").mockResolvedValue(chargingStation);
+            vi.spyOn(ChargingStationTypeRepo, "getById").mockResolvedValue(chargingStationType);
+            vi.spyOn(ConnectorRepo, "get").mockResolvedValue([{name: "connector1", priority: false, id:"123"}]);
+
+            await expect(chargingStationValidation.updateAction(mockReq, mockRes, next)).rejects.toThrow(BadRequestError);
+        });
+
+        it("calls next if connectors count matches charging station type plug count", async () => {
+            mockReq.body = { chargingStationTypeId: "type-id" };
+            vi.spyOn(ChargingStationRepo, "getById").mockResolvedValue(chargingStation);
+
+            vi.spyOn(ChargingStationTypeRepo, "getById").mockResolvedValue(chargingStationType);
+            vi.spyOn(ConnectorRepo, "get").mockResolvedValue([
+                {name: "connector1", priority: false, id:"123"}, {name: "connector2", priority: true, id:"312"}
+            ]);
+
+            await chargingStationValidation.updateAction(mockReq, mockRes, next);
 
             expect(next).toHaveBeenCalled();
         });

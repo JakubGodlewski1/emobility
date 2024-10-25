@@ -1,6 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import Repo from "../../../src/repos/base.repo.js";
-import {validateTableNames} from "../../../src/utils/ValidateTableNames.js";
 import pool from "../../../src/lib/orm/db.js";
 import {toCamelCase} from "../../../src/lib/orm/ToCamelCase.js";
 import {toSnakeCase} from "../../../src/lib/orm/toSnakeCase.js";
