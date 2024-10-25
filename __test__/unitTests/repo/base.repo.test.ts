@@ -59,26 +59,37 @@ describe('Repo', () => {
     });
 
     describe('get', () => {
-        it('should return all records if no filters are provided', async () => {
+        it('should return all records with default pagination if no filters are provided', async () => {
             const mockData = [{ id: '1', name: 'test' }];
             vi.mocked(pool.query).mockResolvedValueOnce({ rows: mockData } as any);
             vi.mocked(toCamelCase).mockReturnValueOnce(mockData);
 
             const result = await repo.get();
+
             expect(result).toEqual(mockData);
-            expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('SELECT * FROM'));
+            expect(pool.query).toHaveBeenCalledWith(
+                expect.stringContaining('SELECT * FROM'),
+                [10, 0] // Default limit and offset
+            );
         });
 
-        it('should apply filters and return records', async () => {
+        it('should apply filters and return records with pagination', async () => {
             const mockData = [{ id: '1', name: 'test' }];
             const filters = { name: 'test' };
+            const limit = 5;
+            const offset = 2;
+
             vi.mocked(toSnakeCase).mockReturnValueOnce(filters);
-            vi.mocked(pool.query).mockResolvedValueOnce({ rows: mockData} as any);
+            vi.mocked(pool.query).mockResolvedValueOnce({ rows: mockData } as any);
             vi.mocked(toCamelCase).mockReturnValueOnce(mockData);
 
-            const result = await repo.get(filters);
+            const result = await repo.get(filters, { limit, offset });
+
             expect(result).toEqual(mockData);
-            expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('WHERE name = $1'), ['test']);
+            expect(pool.query).toHaveBeenCalledWith(
+                expect.stringContaining('WHERE name = $1'),
+                ['test', limit, offset] // Includes limit and offset as expected
+            );
         });
     });
 

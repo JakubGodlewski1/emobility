@@ -30,12 +30,16 @@ export default class Controller<T extends Record<string, any>> {
     }
 
     get = async (req: Request, res: Response) => {
-        const queries = req.query as Partial<T>
-        const elements = await this.repo.get(queries)
+        const { limit, offset, ...filters } = req.query as Partial<T> & { limit?: string; offset?: string };
 
-        const reply: Reply = {success: true, data: elements}
-        res.status(StatusCodes.OK).json(reply)
-    }
+        const parsedLimit = limit ? parseInt(limit, 10) : 10;
+        const parsedOffset = offset ? parseInt(offset, 10) : 0;
+
+        const elements = await this.repo.get(filters, { limit: parsedLimit, offset: parsedOffset });
+
+        const reply: Reply = { success: true, data: elements };
+        res.status(StatusCodes.OK).json(reply);
+    };
 
     deleteById = async (req: Request, res: Response) => {
         const {id} = req.params

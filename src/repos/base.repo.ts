@@ -43,34 +43,34 @@ export default class Repo<T extends Record<string, any>> {
         return toCamelCase(rows)[0] as T
     }
 
-    get = async (filters?: Partial<Record<keyof T, string>>, {client: transactionClient}: {
-        client?: PoolClient
-    } = {}): Promise<T[]> => {
-        const client = getQueryClient(transactionClient)
+    get = async (
+        filters?: Partial<Record<keyof T, string>>,
+        { client: transactionClient, limit = 10, offset = 0 }: { client?: PoolClient; limit?: number; offset?: number } = {}
+    ): Promise<T[]> => {
+        const client = getQueryClient(transactionClient);
 
-        //if no filters are provided, return all the objects
         if (!filters || Object.keys(filters).length === 0) {
-            const {rows} = await client.query(`
+            const { rows } = await client.query(`
             SELECT * FROM ${this.tableName}
-    `);
+            LIMIT $1 OFFSET $2
+        `, [limit, offset]);
             return toCamelCase(rows) as T[];
         }
 
-        //prepare filters to inject into sql query
         const snakeCasedFilters = toSnakeCase(filters);
         const keys = Object.keys(snakeCasedFilters) as Array<keyof typeof snakeCasedFilters>;
 
         const conditions = keys.map((key, index) => `${key} = $${index + 1}`).join(' AND ');
         const values = keys.map(key => snakeCasedFilters[key]);
 
-        //query
-        const {rows} = await pool.query(`
+        const { rows } = await client.query(`
         SELECT * FROM ${this.tableName}
-        WHERE ${conditions};
-    `, values);
+        WHERE ${conditions}
+        LIMIT $${values.length + 1} OFFSET $${values.length + 2}
+    `, [...values, limit, offset]);
 
         return toCamelCase(rows) as T[];
-    }
+    };
 
 
     deleteById = async (id: string, {client: transactionClient}: { client?: PoolClient } = {}): Promise<T> => {
@@ -135,7 +135,6 @@ export default class Repo<T extends Record<string, any>> {
             throw new Error("No element provided for insertion");
         }
 
-
         const columns = Object.keys(toSnakeCase(element));
 
         const valuesPlaceholders = `(${columns.map((_, i) => `$${i + 1}`).join(', ')})`;
@@ -150,7 +149,6 @@ export default class Repo<T extends Record<string, any>> {
 
         const {rows} = await client.query(query, values);
 
-        // Return a single inserted row as the result
         return toCamelCase(rows)[0] as T;
     };
 }
