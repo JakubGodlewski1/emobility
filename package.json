@@ -10,8 +10,8 @@
     "test:ui": "vitest --ui",
     "migrate": "node-pg-migrate -m './dbMigrations/migrations'",
     "build": "tsc",
-    "docker-compose ": "docker compose up",
-    "docker-compose:dev": "docker compose -f docker-compose.dev.yml up",
+    "docker-compose": "docker compose up",
+    "docker-compose:db": "docker compose -f docker-compose.dev.yml up"
   },
   "keywords": [],
   "author": "",
