@@ -10,16 +10,17 @@ Before starting anything, make sure to add all 4 .env files to the root of the p
 - for production and manual testing e.g. with postman (emobility)
 
 **To start development and testing:**
-- spin up the databases with: npm run docker-compose:db
-  It will start the databases and run all necessary migrations. It may take a while during first run.
 - Install all necessary dependencies. Run - *npm install*
   (If you don't have node installed on your computer, you can still test the app. Scroll to "Production and manual testing" to learn more)
+  
+- spin up the databases with: npm run docker-compose:db
+  It will start the databases and run all necessary migrations. It may take a while during first run.
 
 -  start development server, run *npm run dev*
 
 - To start tests, run *npm run test*
-  All unit tests mock all external functions, db etc.
-  All unit tests save and get data from real db for maximum certainty.
+  - All unit tests mock all external functions, db etc.
+  - All integration tests save and get data from real db for maximum certainty.
 
 ## App flow
 
@@ -30,7 +31,7 @@ In order to create a charging station with specified type and connectors, read t
 **suggested app flow:**
 
 - sign in
-- create a charging station
+- create a charging station without chargingStationTypeId
 - create connectors with chargingStationId specified.
 - find or create a charging station type with plug_count equals to the amount of connectors connected to the charging station
 - update charging station - set "chargingStationTypeId" to the id of the created type
@@ -39,7 +40,7 @@ In order to create a charging station with specified type and connectors, read t
 
 All endpoints start with: **/api/v1** e.g. api/v1/connectors/:id
 
-**Auth related endpoints. In gray box is structure of the body**
+**Auth related endpoints. In gray boxes is the structure of the body**
 
 sign in
 > POST /auth/sign-in
@@ -56,7 +57,7 @@ Refresh access token
 Logout
 >GET /auth/logout
 
-**All other endpoints have the same structure, they only differ with prefix (e.g. "/connectors", "/charging-stations" or "/charging-station-types"**)
+**All endpoints except /auth have the same structure, they only differ with prefix (e.g. "/connectors", "/charging-stations" or "/charging-station-types"**)
 
 The example below is made with "/charging-stations", but apply to all other routes.
 
@@ -95,9 +96,11 @@ create element
 ## Production and manual testing
 If you want to deploy the app to the server or just test it with postman, you can run
 *npm run docker-compose*.
-It will spin up both database and server in a docker container, so you don't need to have node on your computer nor postgres.
+It will spin up both database and server in a docker container, so you don't need to have node  nor postgres on your computer.
+
+If you have started the app in development (npm run dev), remember to close the dev server, since both development and production server run on the same port.
 
 ## Ports
 
 - Databases run on port 5432
-- Both development and production version runs on port 3000
+- Both development and production server run on port 3000
